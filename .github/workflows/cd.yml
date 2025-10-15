@@ -12,8 +12,10 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
+      - name: 📦 Install Railway CLI
+        run: npm install -g @railway/cli
+
       - name: 🚀 Deploy to Railway
-        uses: bervProject/railway-deploy@main
-        with:
-          service: PersiapanLomba
-          args: login --apiKey ${{ secrets.RAILWAY_TOKEN }} && railway up
+        run: railway up --service PersiapanLomba
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
