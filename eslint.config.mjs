@@ -41,7 +41,7 @@ export default [
       ...typescript.configs.recommended.rules,
       ...prettierConfig.rules,
       'prettier/prettier': 'error',
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-console': ['warn', { allow: ['log','warn', 'error'] }],
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
