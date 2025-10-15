@@ -1,0 +1,32 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+build
+
+# Coverage
+coverage
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Git
+.git
+
+# OS
+.DS_Store
+
+# Config files (optional, tapi biasanya di-ignore)
+tsconfig.json
+jest.config.js
+.eslintrc.js
