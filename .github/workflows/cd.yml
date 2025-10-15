@@ -15,5 +15,5 @@ jobs:
       - name: 🚀 Deploy to Railway
         uses: bervProject/railway-deploy@main
         with:
-          service: BackendLomba
+          service: PersiapanLomba
           args: login --apiKey ${{ secrets.RAILWAY_TOKEN }} && railway up
