@@ -56,6 +56,62 @@ export default [
     },
   },
   {
+    files: ['**/__tests__/**/*.ts', '**/*.test.ts', '**/*.spec.ts'],
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        ecmaVersion: 2022,
+        sourceType: 'module',
+        project: './tsconfig.json',
+      },
+      globals: {
+        // Node globals
+        console: 'readonly',
+        process: 'readonly',
+        Buffer: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        module: 'readonly',
+        require: 'readonly',
+        exports: 'readonly',
+        global: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        setImmediate: 'readonly',
+        clearImmediate: 'readonly',
+        describe: 'readonly',
+        test: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeAll: 'readonly',
+        beforeEach: 'readonly',
+        afterAll: 'readonly',
+        afterEach: 'readonly',
+        jest: 'readonly',
+        vi: 'readonly', // for Vitest
+      },
+    },
+    plugins: {
+      '@typescript-eslint': typescript,
+      prettier: prettier,
+    },
+    rules: {
+      ...typescript.configs.recommended.rules,
+      ...prettierConfig.rules,
+      'prettier/prettier': 'error',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.js', '**/*.mjs', '**/*.cjs'],
     languageOptions: {
       ecmaVersion: 2022,
