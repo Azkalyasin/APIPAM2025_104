@@ -1,19 +1,19 @@
-name: Deploy to Railway
+name: 🚀 Deploy to Railway
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-      
+
       - name: 🚀 Deploy to Railway
         uses: bervProject/railway-deploy@main
         with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: Backend-lomba
+          service: BackendLomba
+          args: login --apiKey ${{ secrets.RAILWAY_TOKEN }} && railway up
