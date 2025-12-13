@@ -1,0 +1,191 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Enum untuk role user
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}
+
+// Enum untuk status order
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+// Tabel Users
+model User {
+  id            BigInt   @id @default(autoincrement())
+  role          UserRole @default(CUSTOMER)
+  name          String   @db.VarChar(150)
+  email         String   @unique @db.VarChar(255)
+  phone         String?  @db.VarChar(20)
+  password_hash String   @db.VarChar(255)
+  created_at    DateTime @default(now())
+
+  // Relations
+  orders                Order[]
+  cart                  Cart?
+  notifications         Notification[]
+  order_status_changes  OrderStatusHistory[]
+
+  @@map("users")
+}
+
+// Tabel Categories
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(100)
+  description String?   @db.Text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  deleted_at  DateTime? // Soft delete
+
+  // Relations
+  menus Menu[]
+
+  @@map("categories")
+}
+
+// Tabel Menus
+model Menu {
+  id           Int       @id @default(autoincrement())
+  category_id  Int
+  name         String    @db.VarChar(200)
+  description  String?   @db.Text
+  image_url    String?   @db.VarChar(500)
+  price        Decimal   @db.Decimal(10, 2)
+  is_available Boolean   @default(true)
+  stock        Int?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime? // Soft delete
+
+  // Relations
+  category    Category    @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  cart_items  CartItem[]
+  order_items OrderItem[]
+
+  @@index([category_id])
+  @@index([is_available])
+  @@map("menus")
+}
+
+// Tabel Carts
+model Cart {
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  cart_items CartItem[]
+
+  @@map("carts")
+}
+
+// Tabel Cart Items
+model CartItem {
+  id         Int      @id @default(autoincrement())
+  cart_id    BigInt
+  menu_id    Int
+  quantity   Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  cart Cart @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+  menu Menu @relation(fields: [menu_id], references: [id], onDelete: Cascade)
+
+  @@index([cart_id])
+  @@index([menu_id])
+  @@unique([cart_id, menu_id]) // Satu menu hanya bisa muncul sekali per cart
+  @@map("cart_items")
+}
+
+// Tabel Orders
+model Order {
+  id             BigInt      @id @default(autoincrement())
+  user_id        BigInt
+  order_number   String      @unique @db.VarChar(50)
+  status         OrderStatus @default(PENDING)
+  total_price    Decimal     @db.Decimal(10, 2)
+  payment_method String?     @db.VarChar(50)
+  notes          String?     @db.Text
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt
+
+  // Relations
+  user           User                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  order_items    OrderItem[]
+  status_history OrderStatusHistory[]
+
+  @@index([user_id])
+  @@index([status])
+  @@index([created_at])
+  @@index([order_number])
+  @@map("orders")
+}
+
+// Tabel Order Items
+model OrderItem {
+  id         BigInt  @id @default(autoincrement())
+  order_id   BigInt
+  menu_id    Int
+  quantity   Int
+  unit_price Decimal @db.Decimal(10, 2)
+  subtotal   Decimal @db.Decimal(10, 2)
+
+  // Relations
+  order Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  menu  Menu  @relation(fields: [menu_id], references: [id], onDelete: Cascade)
+
+  @@index([order_id])
+  @@index([menu_id])
+  @@map("order_items")
+}
+
+// Tabel Order Status History
+model OrderStatusHistory {
+  id         BigInt      @id @default(autoincrement())
+  order_id   BigInt
+  old_status OrderStatus?
+  new_status OrderStatus
+  changed_at DateTime    @default(now())
+  changed_by BigInt
+
+  // Relations
+  order           Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  changed_by_user User  @relation(fields: [changed_by], references: [id], onDelete: Cascade)
+
+  @@index([order_id])
+  @@map("order_status_history")
+}
+
+// Tabel Notifications
+model Notification {
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt
+  title      String   @db.VarChar(200)
+  body       String   @db.Text
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([is_read])
+  @@map("notifications")
+}

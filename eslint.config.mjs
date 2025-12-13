@@ -41,7 +41,7 @@ export default [
       ...typescript.configs.recommended.rules,
       ...prettierConfig.rules,
       'prettier/prettier': 'error',
-      'no-console': ['warn', { allow: ['log','warn', 'error'] }],
+      'no-console': ['warn', { allow: ['log', 'warn', 'error'] }],
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
@@ -153,6 +153,8 @@ export default [
       '*.config.js',
       '*.config.mjs',
       '*.config.cjs',
+      '*.config.ts',
+      'prisma.config.ts',
     ],
   },
 ];

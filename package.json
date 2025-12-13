@@ -1,6 +1,7 @@
 {
   "name": "persiapanlomba",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -28,6 +29,8 @@
   },
   "homepage": "https://github.com/Azkalyasin/PersiapanLomba#readme",
   "dependencies": {
+    "@prisma/client": "^7.1.0",
+    "bcrypt": "^6.0.0",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
@@ -52,6 +55,7 @@
     "jest": "^30.2.0",
     "nodemo": "^1.0.0",
     "prettier": "^3.6.2",
+    "prisma": "^7.1.0",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
