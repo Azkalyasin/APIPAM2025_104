@@ -6,7 +6,7 @@ dotenv.config();
 
 // simple config object
 const config = {
-  port: process.env.PORT ? Number(process.env.PORT) : 5000,
+  port: process.env.PORT,
   nodeEnv: process.env.NODE_ENV || 'development',
 };
 
