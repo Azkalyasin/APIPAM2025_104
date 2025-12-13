@@ -1,6 +1,7 @@
 import express from 'express';
 import helmet from 'helmet';
 import { Request, Response } from 'express';
+import authRoutes from './routes/auth.routes';
 
 const app = express();
 app.use(helmet());
@@ -21,5 +22,7 @@ app.get('/', (_req: Request, res: Response) => {
     version: '1.0.0',
   });
 });
+
+app.use('/api/v1', authRoutes);
 
 export default app;

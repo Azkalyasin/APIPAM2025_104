@@ -145,6 +145,14 @@ export default [
     },
   },
   {
+    files: ['**/*.d.ts'],
+    rules: {
+      '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+    },
+  },
+  {
     ignores: [
       'node_modules/**',
       'dist/**',
