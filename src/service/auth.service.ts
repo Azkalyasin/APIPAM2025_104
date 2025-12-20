@@ -9,19 +9,15 @@ const JWT_REFRESH_SECRET = config.jwtRefreshSecret;
 const SALT_ROUNDS = config.saltRounds;
 
 const generateAccessToken = (payload: TokenPayload): string => {
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: '15m',
-  });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '15m' });
 };
 
 const generateRefreshToken = (payload: TokenPayload): string => {
-  return jwt.sign(payload, JWT_REFRESH_SECRET, {
-    expiresIn: '7d',
-  });
+  return jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn: '7d' });
 };
 
 export const register = async (data: RegisterInput) => {
-  const { name, email, phone, password, role = 'CUSTOMER' } = data;
+  const { name, email, phone, password, role = 'ADMIN' } = data;
 
   const existingUser = await prisma.user.findUnique({
     where: { email },
@@ -53,14 +49,9 @@ export const register = async (data: RegisterInput) => {
 
   if (role === 'CUSTOMER') {
     await prisma.cart.create({
-      data: {
-        user_id: user.id,
-      },
+      data: { user_id: user.id },
     });
   }
-
-  // convert BigInt id to number for JSON serialization
-  const userForResponse = { ...user, id: Number(user.id) };
 
   const accessToken = generateAccessToken({
     userId: user.id.toString(),
@@ -75,7 +66,7 @@ export const register = async (data: RegisterInput) => {
   });
 
   return {
-    user: userForResponse,
+    user,
     accessToken,
     refreshToken,
   };
@@ -84,24 +75,20 @@ export const register = async (data: RegisterInput) => {
 export const login = async (data: LoginInput) => {
   const { email, password } = data;
 
-  // Cari user berdasarkan email
   const user = await prisma.user.findUnique({
     where: { email },
   });
 
-  // REQ-AUTH-005: Validasi credentials
   if (!user) {
     throw new Error('Email atau password salah');
   }
 
-  // Verify password
   const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
   if (!isPasswordValid) {
     throw new Error('Email atau password salah');
   }
 
-  // Generate tokens
   const accessToken = generateAccessToken({
     userId: user.id.toString(),
     email: user.email,
@@ -114,17 +101,10 @@ export const login = async (data: LoginInput) => {
     role: user.role,
   });
 
-  // Return user tanpa password
   const { password_hash: _password_hash, ...userWithoutPassword } = user;
 
-  // convert BigInt id to number for JSON serialization
-  const userWithoutPasswordSafe = {
-    ...userWithoutPassword,
-    id: Number((userWithoutPassword as any).id),
-  };
-
   return {
-    user: userWithoutPasswordSafe,
+    user: userWithoutPassword,
     accessToken,
     refreshToken,
   };
@@ -132,20 +112,16 @@ export const login = async (data: LoginInput) => {
 
 export const refreshAccessToken = async (refreshToken: string) => {
   try {
-    // Verify refresh token
     const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as TokenPayload;
 
-    // Generate new access token
     const newAccessToken = generateAccessToken({
       userId: decoded.userId,
       email: decoded.email,
       role: decoded.role,
     });
 
-    return {
-      accessToken: newAccessToken,
-    };
-  } catch (_error) {
+    return { accessToken: newAccessToken };
+  } catch {
     throw new Error('Refresh token tidak valid atau sudah expired');
   }
 };
@@ -153,13 +129,13 @@ export const refreshAccessToken = async (refreshToken: string) => {
 export const verifyAccessToken = (token: string): TokenPayload => {
   try {
     return jwt.verify(token, JWT_SECRET) as TokenPayload;
-  } catch (_error) {
+  } catch {
     throw new Error('Token tidak valid atau sudah expired');
   }
 };
 
-export const getUserById = async (userId: number | string | bigint) => {
-  const id = typeof userId === 'bigint' ? Number(userId) : Number(userId);
+export const getUserById = async (userId: number | string) => {
+  const id = Number(userId);
 
   const user = await prisma.user.findUnique({
     where: { id },
@@ -177,10 +153,5 @@ export const getUserById = async (userId: number | string | bigint) => {
     throw new Error('User tidak ditemukan');
   }
 
-  // convert any BigInt fields to serializable values
-  const safeUser = JSON.parse(
-    JSON.stringify(user, (_k, v) => (typeof v === 'bigint' ? v.toString() : v))
-  );
-
-  return safeUser;
+  return user;
 };

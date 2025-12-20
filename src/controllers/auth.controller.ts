@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as authService from '../service/auth.service';
+import logger from '../utils/logger';
 
 // Add this interface
 interface AuthRequest extends Request {
@@ -19,7 +20,7 @@ export const register = async (req: Request, res: Response): Promise<Response> =
       email,
       phone,
       password,
-      role: 'CUSTOMER',
+      role: 'ADMIN',
     });
 
     return res.status(201).json({
@@ -39,7 +40,8 @@ export const register = async (req: Request, res: Response): Promise<Response> =
       });
     }
 
-    console.error('Register error:', error);
+    logger.error('Register error', error);
+
     return res.status(500).json({
       success: false,
       message: 'Terjadi kesalahan saat registrasi',
@@ -70,7 +72,8 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
       });
     }
 
-    console.error('Login error:', error);
+    logger.error('Login error', error);
+
     return res.status(500).json({
       success: false,
       message: 'Terjadi kesalahan saat login',
@@ -92,7 +95,8 @@ export const refresh = async (req: Request, res: Response): Promise<Response> =>
       },
     });
   } catch (error) {
-    console.error('Refresh token error:', error);
+    logger.error('Refresh token error', error);
+
     return res.status(401).json({
       success: false,
       message: error instanceof Error ? error.message : 'Refresh token tidak valid',
@@ -112,7 +116,7 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<Respo
       });
     }
 
-    const user = await authService.getUserById(BigInt(userId));
+    const user = await authService.getUserById(userId);
 
     return res.status(200).json({
       success: true,
@@ -120,7 +124,8 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<Respo
       data: { user },
     });
   } catch (error) {
-    console.error('Get profile error:', error);
+    logger.error('Get profile error', error);
+
     return res.status(500).json({
       success: false,
       message: 'Terjadi kesalahan saat mengambil profil',

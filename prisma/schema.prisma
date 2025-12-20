@@ -26,7 +26,7 @@ enum OrderStatus {
 
 // Tabel Users
 model User {
-  id            BigInt   @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   role          UserRole @default(CUSTOMER)
   name          String   @db.VarChar(150)
   email         String   @unique @db.VarChar(255)
@@ -37,7 +37,6 @@ model User {
   // Relations
   orders                Order[]
   cart                  Cart?
-  notifications         Notification[]
   order_status_changes  OrderStatusHistory[]
 
   @@map("users")
@@ -84,8 +83,8 @@ model Menu {
 
 // Tabel Carts
 model Cart {
-  id         BigInt   @id @default(autoincrement())
-  user_id    BigInt   @unique
+  id         Int      @id @default(autoincrement())
+  user_id    Int      @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -99,7 +98,7 @@ model Cart {
 // Tabel Cart Items
 model CartItem {
   id         Int      @id @default(autoincrement())
-  cart_id    BigInt
+  cart_id    Int
   menu_id    Int
   quantity   Int
   created_at DateTime @default(now())
@@ -117,8 +116,8 @@ model CartItem {
 
 // Tabel Orders
 model Order {
-  id             BigInt      @id @default(autoincrement())
-  user_id        BigInt
+  id             Int         @id @default(autoincrement())
+  user_id        Int
   order_number   String      @unique @db.VarChar(50)
   status         OrderStatus @default(PENDING)
   total_price    Decimal     @db.Decimal(10, 2)
@@ -141,8 +140,8 @@ model Order {
 
 // Tabel Order Items
 model OrderItem {
-  id         BigInt  @id @default(autoincrement())
-  order_id   BigInt
+  id         Int     @id @default(autoincrement())
+  order_id   Int
   menu_id    Int
   quantity   Int
   unit_price Decimal @db.Decimal(10, 2)
@@ -159,12 +158,12 @@ model OrderItem {
 
 // Tabel Order Status History
 model OrderStatusHistory {
-  id         BigInt      @id @default(autoincrement())
-  order_id   BigInt
+  id         Int         @id @default(autoincrement())
+  order_id   Int
   old_status OrderStatus?
   new_status OrderStatus
   changed_at DateTime    @default(now())
-  changed_by BigInt
+  changed_by Int
 
   // Relations
   order           Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
@@ -172,21 +171,4 @@ model OrderStatusHistory {
 
   @@index([order_id])
   @@map("order_status_history")
-}
-
-// Tabel Notifications
-model Notification {
-  id         BigInt   @id @default(autoincrement())
-  user_id    BigInt
-  title      String   @db.VarChar(200)
-  body       String   @db.Text
-  is_read    Boolean  @default(false)
-  created_at DateTime @default(now())
-
-  // Relations
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([user_id])
-  @@index([is_read])
-  @@map("notifications")
 }

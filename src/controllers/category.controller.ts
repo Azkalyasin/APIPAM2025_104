@@ -6,6 +6,7 @@ import {
   getAllCategories,
   getCategoryById,
 } from '../service/category.service';
+import logger from '../utils/logger';
 
 export const createcategory = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -18,7 +19,7 @@ export const createcategory = async (req: Request, res: Response): Promise<void>
       data: category,
     });
   } catch (error) {
-    console.error(error);
+    logger.error('Create category error', error);
     res.status(500).json({ success: false });
   }
 };
@@ -28,7 +29,7 @@ export const getCategories = async (_req: Request, res: Response): Promise<void>
     const categories = await getAllCategories();
     res.status(200).json({ success: true, data: categories });
   } catch (error) {
-    console.error(error);
+    logger.error('Get categories error', error);
     res.status(500).json({ success: false });
   }
 };
@@ -45,7 +46,7 @@ export const getCategory = async (req: Request, res: Response): Promise<void> =>
 
     res.status(200).json({ success: true, data: category });
   } catch (error) {
-    console.error(error);
+    logger.error('Get category by id error', error);
     res.status(500).json({ success: false });
   }
 };
@@ -58,7 +59,7 @@ export const updatecategory = async (req: Request, res: Response): Promise<void>
 
     res.status(200).json({ success: true, data: category });
   } catch (error) {
-    console.error(error);
+    logger.error('Update category error', error);
     res.status(500).json({ success: false });
   }
 };
@@ -70,7 +71,7 @@ export const deletecategory = async (req: Request, res: Response): Promise<void>
 
     res.status(200).json({ success: true, data: category });
   } catch (error) {
-    console.error(error);
+    logger.error('Delete category error', error);
     res.status(500).json({ success: false });
   }
 };

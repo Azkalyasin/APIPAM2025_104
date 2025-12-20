@@ -3,6 +3,7 @@ import helmet from 'helmet';
 import { Request, Response } from 'express';
 import authRoutes from './routes/auth.routes';
 import categoryRoutes from './routes/category.routes';
+import menuRoutes from './routes/menu.routes';
 
 const app = express();
 app.use(helmet());
@@ -26,5 +27,6 @@ app.get('/', (_req: Request, res: Response) => {
 
 app.use('/api/v1', authRoutes);
 app.use('/api/v1', categoryRoutes);
+app.use('/api/v1', menuRoutes);
 
 export default app;
