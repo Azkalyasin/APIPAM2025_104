@@ -2,6 +2,7 @@ import express from 'express';
 import helmet from 'helmet';
 import { Request, Response } from 'express';
 import authRoutes from './routes/auth.routes';
+import categoryRoutes from './routes/category.routes';
 
 const app = express();
 app.use(helmet());
@@ -24,5 +25,6 @@ app.get('/', (_req: Request, res: Response) => {
 });
 
 app.use('/api/v1', authRoutes);
+app.use('/api/v1', categoryRoutes);
 
 export default app;
