@@ -20,7 +20,7 @@ export const register = async (req: Request, res: Response): Promise<Response> =
       email,
       phone,
       password,
-      role: 'ADMIN',
+      role: 'CUSTOMER',
     });
 
     return res.status(201).json({

@@ -1,7 +1,7 @@
 import prisma from '../config/database';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { RegisterInput, LoginInput, TokenPayload } from '../types/auth.type';
+import { RegisterRequest, LoginRequest, TokenPayload, AuthResponse } from '../types/auth.type';
 import { config } from '../config/config';
 
 const JWT_SECRET = config.jwtSecret;
@@ -16,8 +16,8 @@ const generateRefreshToken = (payload: TokenPayload): string => {
   return jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn: '7d' });
 };
 
-export const register = async (data: RegisterInput) => {
-  const { name, email, phone, password, role = 'ADMIN' } = data;
+export const register = async (data: RegisterRequest): Promise<AuthResponse> => {
+  const { name, email, phone, password, role = 'CUSTOMER' } = data;
 
   const existingUser = await prisma.user.findUnique({
     where: { email },
@@ -72,7 +72,7 @@ export const register = async (data: RegisterInput) => {
   };
 };
 
-export const login = async (data: LoginInput) => {
+export const login = async (data: LoginRequest): Promise<AuthResponse> => {
   const { email, password } = data;
 
   const user = await prisma.user.findUnique({
