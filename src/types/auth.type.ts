@@ -1,6 +1,6 @@
 import { UserRole } from '@prisma/client';
 
-export interface RegisterInput {
+export interface RegisterRequest {
   name: string;
   email: string;
   phone?: string;
@@ -8,13 +8,32 @@ export interface RegisterInput {
   role?: UserRole;
 }
 
-export interface LoginInput {
+export interface LoginRequest {
   email: string;
   password: string;
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
 }
 
 export interface TokenPayload {
   userId: string;
   email: string;
-  role: string;
+  role: UserRole;
+}
+
+export interface AuthUserResponse {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string | null;
+  role: UserRole;
+  created_at: Date;
+}
+
+export interface AuthResponse {
+  user: AuthUserResponse;
+  accessToken: string;
+  refreshToken: string;
 }

@@ -15,23 +15,21 @@ router.get('/menus', authenticate, authorize('ADMIN', 'CUSTOMER'), getMenus);
 
 router.get('/menus/:id', authenticate, authorize('ADMIN', 'CUSTOMER'), getMenu);
 
-// ✅ CREATE MENU + IMAGE
 router.post(
   '/menus',
   authenticate,
   adminOnly,
   authorize('ADMIN'),
-  upload.single('image'), // 🔥 WAJIB
+  upload.single('image'),
   CreateMenu
 );
 
-// ✅ UPDATE MENU + IMAGE (OPTIONAL)
 router.put(
   '/menus/:id',
   authenticate,
   adminOnly,
   authorize('ADMIN'),
-  upload.single('image'), // 🔥 WAJIB
+  upload.single('image'),
   updatemenu
 );
 

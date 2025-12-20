@@ -1,4 +1,4 @@
-export interface CreateMenu {
+export interface CreateMenuRequest {
   name: string;
   description?: string;
   price: number;
@@ -8,7 +8,7 @@ export interface CreateMenu {
   stock?: number;
 }
 
-export interface UpdateMenu {
+export interface UpdateMenuRequest {
   id: number;
   name?: string;
   description?: string;
@@ -19,8 +19,25 @@ export interface UpdateMenu {
   stock?: number;
 }
 
-export interface MenuFilter {
+export interface MenuFilterRequest {
   categoryId?: number;
   is_available?: boolean;
   search?: string;
+}
+
+export interface MenuResponse {
+  id: number;
+  name: string;
+  description?: string | null;
+  price: number;
+  image_url?: string | null;
+  is_available: boolean;
+  stock?: number | null;
+  created_at: Date;
+  updated_at: Date;
+
+  category: {
+    id: number;
+    name: string;
+  };
 }
