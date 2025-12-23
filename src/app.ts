@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.routes';
 import categoryRoutes from './routes/category.routes';
 import menuRoutes from './routes/menu.routes';
 import cartRoutes from './routes/cart.routes';
+import orderRoutes from './routes/order.routes';
 
 const app = express();
 app.use(helmet());
@@ -30,4 +31,5 @@ app.use('/api/v1', authRoutes);
 app.use('/api/v1', categoryRoutes);
 app.use('/api/v1', menuRoutes);
 app.use('/api/v1', cartRoutes);
+app.use('/api/v1/orders', orderRoutes);
 export default app;
