@@ -7,6 +7,7 @@ const router = Router();
 
 router.get('/categories', authenticate, category.getCategories);
 router.post('/categories', authenticate, adminOnly, category.createcategory);
+router.get('/categories/:id', authenticate, category.getCategory);
 router.put('/categories/:id', authenticate, adminOnly, category.updatecategory);
 router.delete('/categories/:id', authenticate, adminOnly, category.deletecategory);
 

@@ -24,7 +24,7 @@ router.post(
   CreateMenu
 );
 
-router.put(
+router.patch(
   '/menus/:id',
   authenticate,
   adminOnly,
