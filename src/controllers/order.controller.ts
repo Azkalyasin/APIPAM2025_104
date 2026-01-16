@@ -113,3 +113,24 @@ export const updateOrderStatusController = async (
     });
   }
 };
+/* ================= GET ALL ORDERS (ADMIN) ✅ TAMBAH INI ================= */
+export const getAllOrdersController = async (
+  _req: AuthRequest,
+  res: Response
+): Promise<Response> => {
+  try {
+    const orders = await orderService.getAllOrders();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Daftar semua order berhasil diambil',
+      data: orders,
+    });
+  } catch (error) {
+    logger.error('Get all orders (admin) error', error);
+    return res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : 'Gagal mengambil orders',
+    });
+  }
+};

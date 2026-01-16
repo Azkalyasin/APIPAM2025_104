@@ -1,5 +1,8 @@
 import express from 'express';
+console.log('🔥 MENU ROUTES LOADED');
 import helmet from 'helmet';
+import dotenv from 'dotenv';
+dotenv.config();
 import { Request, Response } from 'express';
 import authRoutes from './routes/auth.routes';
 import categoryRoutes from './routes/category.routes';
@@ -23,7 +26,7 @@ app.get('/health', (_req: Request, res: Response) => {
 app.get('/', (_req: Request, res: Response) => {
   res.json({
     message: '🚀 API up and running',
-    version: '1.0.0',
+    version: '5.0.0',
   });
 });
 

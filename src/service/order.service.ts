@@ -47,6 +47,14 @@ export const createOrder = async (
     throw new Error('Cart is empty');
   }
 
+  for (const item of cart.cart_items) {
+    const currentStock = item.menu.stock ?? 0; // Jika null, anggap 0
+
+    if (currentStock < item.quantity) {
+      throw new Error(`Stok ${item.menu.name} tidak mencukupi. Tersedia: ${currentStock}`);
+    }
+  }
+
   let totalPrice = 0;
 
   const orderItems = cart.cart_items.map((item) => {
@@ -77,6 +85,17 @@ export const createOrder = async (
         order_items: { include: { menu: { select: { id: true, name: true, image_url: true } } } },
       },
     });
+
+    for (const item of cart.cart_items) {
+      const currentStock = item.menu.stock ?? 0;
+
+      await tx.menu.update({
+        where: { id: item.menu_id },
+        data: {
+          stock: Math.max(0, currentStock - item.quantity), // Pastikan tidak negatif
+        },
+      });
+    }
 
     // Hapus semua item dari cart
     await tx.cartItem.deleteMany({ where: { cart_id: cart.id } });
@@ -143,4 +162,18 @@ export const updateOrderStatus = async (
   });
 
   return mapOrderToResponse(order);
+};
+
+export const getAllOrders = async (): Promise<OrderResponse[]> => {
+  const orders = await prisma.order.findMany({
+    // ✅ TIDAK ADA where: { user_id } → ambil semua order
+    orderBy: { created_at: 'desc' },
+    include: {
+      order_items: { include: { menu: { select: { id: true, name: true, image_url: true } } } },
+      // ✅ Optional: Include user info untuk admin
+      user: { select: { id: true, email: true, name: true } },
+    },
+  });
+
+  return orders.map(mapOrderToResponse);
 };

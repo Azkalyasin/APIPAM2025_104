@@ -113,34 +113,58 @@ export const updatemenu = async (req: MulterRequest, res: Response): Promise<voi
     }
 
     // ============================================
-    // PENTING: Build updateData dengan benar
-    // JANGAN kirim field yang undefined/null/empty
+    // Build updateData dengan validasi ketat
     // ============================================
     const updateData: any = { id };
 
-    if (name && name.trim() !== '') {
+    // Name
+    if (name && typeof name === 'string' && name.trim() !== '') {
       updateData.name = name.trim();
       console.log(`✓ name: "${updateData.name}"`);
     }
 
+    // Description
     if (description !== undefined && description !== null) {
-      updateData.description = description.trim();
+      updateData.description = typeof description === 'string' ? description.trim() : '';
       console.log(`✓ description: "${updateData.description}"`);
     }
 
-    if (price && price !== '') {
-      updateData.price = parseFloat(price);
-      console.log(`✓ price: ${updateData.price}`);
+    // Price - DENGAN VALIDASI
+    if (price !== undefined && price !== null && price !== '') {
+      const priceNum = parseFloat(price);
+      if (!isNaN(priceNum) && priceNum > 0) {
+        updateData.price = priceNum;
+        console.log(`✓ price: ${updateData.price}`);
+      } else {
+        console.log(`⚠️  Invalid price: ${price}, skipping...`);
+      }
     }
 
-    if (category_id && category_id !== '' && category_id !== '0') {
-      updateData.categoryId = parseInt(category_id);
-      console.log(`✓ categoryId: ${updateData.categoryId}`);
+    // Category ID - DENGAN VALIDASI
+    if (
+      category_id !== undefined &&
+      category_id !== null &&
+      category_id !== '' &&
+      category_id !== '0'
+    ) {
+      const catId = parseInt(category_id, 10);
+      if (!isNaN(catId) && catId > 0) {
+        updateData.categoryId = catId;
+        console.log(`✓ categoryId: ${updateData.categoryId}`);
+      } else {
+        console.log(`⚠️  Invalid category_id: ${category_id}, skipping...`);
+      }
     }
 
-    if (stock && stock !== '') {
-      updateData.stock = parseInt(stock);
-      console.log(`✓ stock: ${updateData.stock}`);
+    // Stock - DENGAN VALIDASI
+    if (stock !== undefined && stock !== null && stock !== '') {
+      const stockNum = parseInt(stock, 10);
+      if (!isNaN(stockNum) && stockNum >= 0) {
+        updateData.stock = stockNum;
+        console.log(`✓ stock: ${updateData.stock}`);
+      } else {
+        console.log(`⚠️  Invalid stock: ${stock}, skipping...`);
+      }
     }
 
     // ============================================
@@ -149,16 +173,16 @@ export const updatemenu = async (req: MulterRequest, res: Response): Promise<voi
     if (is_available !== undefined && is_available !== null && is_available !== '') {
       console.log(`🔍 is_available INPUT: "${is_available}" (type: ${typeof is_available})`);
 
-      // Convert apapun ke boolean
       let boolValue: boolean;
       if (typeof is_available === 'boolean') {
         boolValue = is_available;
       } else if (typeof is_available === 'string') {
-        boolValue = is_available.toLowerCase() === 'true' || is_available === '1';
+        const lowerStr = is_available.toLowerCase().trim();
+        boolValue = lowerStr === 'true' || lowerStr === '1';
       } else if (typeof is_available === 'number') {
         boolValue = is_available === 1;
       } else {
-        boolValue = false;
+        boolValue = Boolean(is_available);
       }
 
       updateData.is_available = boolValue;
@@ -167,12 +191,35 @@ export const updatemenu = async (req: MulterRequest, res: Response): Promise<voi
       );
     }
 
+    // Image URL
     if (imageUrl) {
       updateData.image_url = imageUrl;
       console.log(`✓ image_url: ${imageUrl}`);
     }
 
-    console.log('\n📤 Sending to service:', JSON.stringify(updateData, null, 2));
+    // ============================================
+    // PENTING: Cleanup undefined values!
+    // Prisma tidak terima undefined
+    // ============================================
+    console.log('\n🧹 Cleaning up undefined values...');
+    Object.keys(updateData).forEach((key) => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
+        console.log(`   ⚠️  Removed: ${key} (was undefined)`);
+      }
+    });
+
+    console.log('\n📤 Final data to service:', JSON.stringify(updateData, null, 2));
+
+    // Validate: Minimal ada 1 field selain id
+    if (Object.keys(updateData).length === 1) {
+      console.log('⚠️  No fields to update!');
+      res.status(400).json({
+        success: false,
+        message: 'Tidak ada data yang diupdate',
+      });
+      return;
+    }
 
     // Call service
     const menu = await updateMenu(updateData);
@@ -186,7 +233,11 @@ export const updatemenu = async (req: MulterRequest, res: Response): Promise<voi
     console.log('✅ SUCCESS!\n');
     logger.info('Menu updated', { menuId: id });
 
-    res.status(200).json({ success: true, data: menu });
+    res.status(200).json({
+      success: true,
+      message: 'Menu berhasil diupdate',
+      data: menu,
+    });
   } catch (error: any) {
     console.log('\n╔════════════════════════════════════════════════════════════╗');
     console.log('║ ❌ ERROR IN CONTROLLER');
@@ -200,7 +251,7 @@ export const updatemenu = async (req: MulterRequest, res: Response): Promise<voi
 
     res.status(500).json({
       success: false,
-      message: 'Gagal mengupdate menu',
+      message: 'Gagal mengupdate menu: ' + (error?.message || 'Unknown error'),
     });
   }
 };

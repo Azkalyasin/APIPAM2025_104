@@ -15,23 +15,9 @@ router.get('/menus', authenticate, authorize('ADMIN', 'CUSTOMER'), getMenus);
 
 router.get('/menus/:id', authenticate, authorize('ADMIN', 'CUSTOMER'), getMenu);
 
-router.post(
-  '/menus',
-  authenticate,
-  adminOnly,
-  authorize('ADMIN'),
-  upload.single('image'),
-  CreateMenu
-);
+router.post('/menus', authenticate, authorize('ADMIN'), upload.single('image'), CreateMenu);
 
-router.patch(
-  '/menus/:id',
-  authenticate,
-  adminOnly,
-  authorize('ADMIN'),
-  upload.single('image'),
-  updatemenu
-);
+router.patch('/menus/:id', authenticate, authorize('ADMIN'), upload.single('image'), updatemenu);
 
 router.delete('/menus/:id', authenticate, adminOnly, authorize('ADMIN'), deletemenu);
 

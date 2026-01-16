@@ -1,3 +1,4 @@
+console.log('🔥 CATEGORY ROUTES LOADED');
 import { Router } from 'express';
 import * as category from '../controllers/category.controller';
 import { authenticate } from '../middlewares/auth.middleware';
@@ -5,6 +6,9 @@ import { adminOnly } from '../middlewares/auth.middleware';
 
 const router = Router();
 
+router.get('/test', (_req, res) => {
+  res.json({ ok: true });
+});
 router.get('/categories', authenticate, category.getCategories);
 router.post('/categories', authenticate, adminOnly, category.createcategory);
 router.get('/categories/:id', authenticate, category.getCategory);
